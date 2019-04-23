@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -201,6 +202,14 @@ public class Session implements AutoCloseable {
         try {
             Connection connection = getConnection().getClient().connect(resolvedSharePath.getHostname());
             Session session = connection.authenticate(getAuthenticationContext());
+            if (connection.getConfig().isNestedSessionsDisabled()) {
+                Iterator<Session> iterator = this.nestedSessions.iterator();
+                while (iterator.hasNext()) {
+                    Session s = iterator.next();
+                    s.close();
+                    iterator.remove();
+                }
+            }
             nestedSessions.add(session);
             return session;
         } catch (IOException e) {
