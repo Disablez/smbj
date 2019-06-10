@@ -615,6 +615,14 @@ public class Buffer<T extends Buffer<T>> {
         }
     }
 
+    public String readStringWithSupplementaryCharacters(int length) throws BufferException {
+        int[] ints = new int[length/2];
+        for (int i = 0; i < ints.length; i++) {
+            ints[i] = this.readUInt16(endianness);
+        }
+        return new String(ints, 0, ints.length);
+    }
+
     /**
      * Read a null-terminated string in the specified encoding.
      * <p/>

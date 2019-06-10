@@ -150,4 +150,31 @@ class BufferSpec extends Specification {
     is.read() == 100
     is.read() == 150
   }
+
+  def "should support round trip for reading and writing characters (also supplemental ones) from/to buffer"() {
+    given:
+    def byteArray = inputByteArray as byte[]
+    def buffer = new Buffer.PlainBuffer(byteArray, Endian.LE)
+
+    when:
+    def string = buffer.readStringWithSupplementaryCharacters(byteArray.length) as String
+    byte[] dst = string.getBytes("UTF-16LE")
+
+    then:
+    dst == byteArray
+
+    where:
+    inputByteArray << [[50, 0, 49, 0, 32, 0, -2, -1, 97, 0],
+                       [50, 0, 49, 0, 32, 0, 0x52, 0xD8, 0x62, 0xDF, 97, 0],
+                       [0x52, 0xD8, 0x62, 0xDF, 97, 0, 0x52, 0xD8, 0x62, 0xDF],
+                       [0x01, 0xD8, 0x37, 0xDC, 97, 0, 0x52, 0xD8, 0x62, 0xDF],
+                       [0xFD, 0xFF, 97, 0, 0x52, 0xD8, 0x62, 0xDF], // replacement characters
+                       [97, 0, 0xFD, 0xFF, 0x52, 0xD8, 0x62, 0xDF], // replacement characters
+                       [0xFF, 0xFE, 97, 0, 0x52, 0xD8, 0x62, 0xDF], // BOM
+                       [97, 0, 0xFF, 0xFE, 0x52, 0xD8, 0x62, 0xDF], // BOM
+                       [],
+                       [-31, 0, -23, 0, -19, 0, -13, 0, -6, 0, -4, 0, -15, 0], // áéíóúüñ
+                       [13, 1, 97, 1, 126, 1, 12, 1, 96, 1, 125, 1, 7, 1, 6, 1, 17, 1, 16, 1] // čšžČŠŽćĆđĐ
+    ]
+  }
 }

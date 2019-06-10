@@ -458,7 +458,7 @@ public class FileInformationFactory {
 
     private static String parseFileNameInformation(Buffer<?> buffer) throws Buffer.BufferException {
         long fileNameLen = buffer.readUInt32(); // File name length
-        return buffer.readString(Charsets.UTF_16LE, (int) fileNameLen / 2);
+        return buffer.readStringWithSupplementaryCharacters((int) fileNameLen);
     }
 
     private static FileBasicInformation parseFileBasicInformation(Buffer<?> buffer) throws Buffer.BufferException {
@@ -510,7 +510,7 @@ public class FileInformationFactory {
             long size = buffer.readLong(); //Signed 64
             long allocSize = buffer.readLong(); //Signed 64
 
-            String name = buffer.readString(Charsets.UTF_16LE, (int) nameLen / 2);
+            String name = buffer.readStringWithSupplementaryCharacters((int) nameLen);
             streamList.add(new FileStreamInformationItem(size, allocSize, name));
         } while (nextEntry != 0);
 
@@ -556,7 +556,7 @@ public class FileInformationFactory {
         buffer.readByte(); // Reserved1 (1)
         byte[] shortNameBytes = buffer.readRawBytes(24);// Shortname
         String shortName = new String(shortNameBytes, 0, shortNameLen, Charsets.UTF_16LE);
-        String fileName = buffer.readString(Charsets.UTF_16LE, (int) fileNameLen / 2);
+        String fileName = buffer.readStringWithSupplementaryCharacters((int) fileNameLen);
         FileBothDirectoryInformation fi = new FileBothDirectoryInformation(
             nextOffset, fileIndex, fileName,
             creationTime, lastAccessTime, lastWriteTime, changeTime,
@@ -606,7 +606,7 @@ public class FileInformationFactory {
         long fileAttributes = buffer.readUInt32();
         long fileNameLen = buffer.readUInt32();
         long eaSize = buffer.readUInt32();
-        String fileName = buffer.readString(Charsets.UTF_16LE, (int) fileNameLen / 2);
+        String fileName = buffer.readStringWithSupplementaryCharacters((int) fileNameLen);
         FileFullDirectoryInformation fi = new FileFullDirectoryInformation(
             nextOffset, fileIndex, fileName,
             creationTime, lastAccessTime, lastWriteTime, changeTime,
@@ -638,7 +638,7 @@ public class FileInformationFactory {
         String shortName = new String(shortNameBytes, 0, shortNameLen, Charsets.UTF_16LE);
         buffer.readUInt16(); // Reserved2
         byte[] fileId = buffer.readRawBytes(8);
-        String fileName = buffer.readString(Charsets.UTF_16LE, (int) fileNameLen / 2);
+        String fileName = buffer.readStringWithSupplementaryCharacters((int) fileNameLen);
         FileIdBothDirectoryInformation fi = new FileIdBothDirectoryInformation(
             nextOffset, fileIndex, fileName,
             creationTime, lastAccessTime, lastWriteTime, changeTime,
@@ -668,7 +668,7 @@ public class FileInformationFactory {
         long eaSize = buffer.readUInt32();
         buffer.skip(4); // Reserved
         byte[] fileId = buffer.readRawBytes(8);
-        String fileName = buffer.readString(Charsets.UTF_16LE, (int) fileNameLen / 2);
+        String fileName = buffer.readStringWithSupplementaryCharacters((int) fileNameLen);
         FileIdFullDirectoryInformation fi = new FileIdFullDirectoryInformation(
             nextOffset, fileIndex, fileName,
             creationTime, lastAccessTime, lastWriteTime, changeTime,
@@ -687,7 +687,7 @@ public class FileInformationFactory {
         long nextOffset = buffer.readUInt32();
         long fileIndex = buffer.readUInt32();
         long fileNameLen = buffer.readUInt32();
-        String fileName = buffer.readString(Charsets.UTF_16LE, (int) fileNameLen / 2);
+        String fileName = buffer.readStringWithSupplementaryCharacters((int) fileNameLen);
         return new FileNamesInformation(nextOffset, fileIndex, fileName);
     }
 
